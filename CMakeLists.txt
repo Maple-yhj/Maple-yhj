@@ -3,6 +3,8 @@ cmake_minimum_required(VERSION 3.10)
 # Set the project name
 project(LeptJsonTests)
 
+set(CMAKE_SUPPRESS_REGENERATION true)
+
 # Specify C++ standard
 set(C_STANDARD 11)
 
@@ -16,8 +18,6 @@ set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/lib)
 
 # Find source files
 file(GLOB SOURCES "src/*.c" "include/*.c")
-
-
 
 # Add executable target with source files
 add_executable(test ${SOURCES})
