@@ -3,6 +3,8 @@
 #include <stdlib.h>
 
 #define EXPECT(c, ch)       do { assert(*c->json == (ch)); c->json++; } while(0)
+#define ISDIGIT(ch)         ((ch) >= '0' && (ch) <= '9')
+#define ISDIGIT1TO9(ch)     ((ch) >= '1' && (ch) <= '9')
 
 typedef struct
 {
@@ -56,6 +58,38 @@ static int lept_parse_literal(lept_context *c , lept_value *v , char *compare_st
 
 }
 
+static int lept_parse_number(lept_context *c , lept_value *v)
+{
+    char* ch = c->json;
+    if(*ch == '-')
+        ch += 1;
+
+    if(!ISDIGIT(ch))
+        return LEPT_PARSE_INVALID_VALUE;
+    else
+        ch += 1;
+    
+    char* cur_ptr = ch;
+    char* after_ptr = ch + 1;
+    while (*cur_ptr != '\0')
+    {
+        if(*cur_ptr == '.' && !ISDIGIT(*after_ptr))
+            return LEPT_PARSE_INVALID_VALUE;
+
+        cur_ptr++;
+        after_ptr++;
+    }
+    
+
+    int res = strtod(c->json,NULL);
+    
+
+    v->n = res;
+    v->type = LEPT_NUM;
+
+    return LEPT_PARSE_OK;
+}
+
 // 判断json的值是否有效
 static int lept_parse_value(lept_context *c ,lept_value *v)
 {
@@ -65,12 +99,10 @@ static int lept_parse_value(lept_context *c ,lept_value *v)
         case 't': return lept_parse_literal(c,v,"true",LEPT_TRUE);
         case 'f': return lept_parse_literal(c,v,"false",LEPT_FALSE);
         case '\0': return LEPT_PARSE_EXPECT_VALUE;
-        default: return LEPT_PARSE_INVALID_VALUE;
+        default: return lept_parse_number(c, v);
         
     }
 }
-
-
 
 int lept_parse(lept_value* v, const char* json)
 {

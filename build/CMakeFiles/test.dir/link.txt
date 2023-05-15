@@ -1,3 +1,0 @@
-E:\CMake\bin\cmake.exe -E rm -f CMakeFiles\test.dir/objects.a
-E:\TDM-GCC-64\bin\ar.exe qc CMakeFiles\test.dir/objects.a @CMakeFiles\test.dir\objects1.rsp
-E:\TDM-GCC-64\bin\gcc.exe -Wl,--whole-archive CMakeFiles\test.dir/objects.a -Wl,--no-whole-archive -o E:\person_project\Maple-yhj\out\test.exe -Wl,--out-implib,E:\person_project\Maple-yhj\lib\libtest.dll.a -Wl,--major-image-version,0,--minor-image-version,0 @CMakeFiles\test.dir\linklibs.rsp

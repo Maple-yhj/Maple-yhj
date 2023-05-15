@@ -1,2 +1,0 @@
-E:\TDM-GCC-64\bin\ar.exe qc E:\person_project\Maple-yhj\lib\libleptjson.a CMakeFiles/leptjson.dir/include/leptjson.c.obj
-E:\TDM-GCC-64\bin\ranlib.exe E:\person_project\Maple-yhj\lib\libleptjson.a
