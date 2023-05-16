@@ -1,0 +1,19 @@
+CMakeFiles/test.dir/include/leptjson.c.obj: \
+ F:\personal_project\studyJson\include\leptjson.c \
+ F:\personal_project\studyJson\include\leptjson.h \
+ F:/TDM-GCC-64/x86_64-w64-mingw32/include/assert.h \
+ F:/TDM-GCC-64/x86_64-w64-mingw32/include/crtdefs.h \
+ F:/TDM-GCC-64/x86_64-w64-mingw32/include/corecrt.h \
+ F:/TDM-GCC-64/x86_64-w64-mingw32/include/_mingw.h \
+ F:/TDM-GCC-64/x86_64-w64-mingw32/include/_mingw_mac.h \
+ F:/TDM-GCC-64/x86_64-w64-mingw32/include/_mingw_secapi.h \
+ F:/TDM-GCC-64/x86_64-w64-mingw32/include/vadefs.h \
+ F:/TDM-GCC-64/x86_64-w64-mingw32/include/sdks/_mingw_ddk.h \
+ F:/TDM-GCC-64/x86_64-w64-mingw32/include/stdlib.h \
+ F:/TDM-GCC-64/x86_64-w64-mingw32/include/corecrt_wstdlib.h \
+ F:/TDM-GCC-64/lib/gcc/x86_64-w64-mingw32/10.3.0/include-fixed/limits.h \
+ F:/TDM-GCC-64/lib/gcc/x86_64-w64-mingw32/10.3.0/include-fixed/syslimits.h \
+ F:/TDM-GCC-64/x86_64-w64-mingw32/include/limits.h \
+ F:/TDM-GCC-64/x86_64-w64-mingw32/include/sec_api/stdlib_s.h \
+ F:/TDM-GCC-64/x86_64-w64-mingw32/include/malloc.h \
+ F:/TDM-GCC-64/x86_64-w64-mingw32/include/math.h

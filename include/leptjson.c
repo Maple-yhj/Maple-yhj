@@ -1,21 +1,38 @@
 #include "leptjson.h"
 #include <assert.h>
 #include <stdlib.h>
+#include <math.h>
+#include <string.h>
 
+
+#define lept_init(v) do { (v)->type = LEPT_NULL; } while(0)
 #define EXPECT(c, ch)       do { assert(*c->json == (ch)); c->json++; } while(0)
 #define ISDIGIT(ch)         ((ch) >= '0' && (ch) <= '9')
 #define ISDIGIT1TO9(ch)     ((ch) >= '1' && (ch) <= '9')
+#define STACK_INIT_SIZE 256;
 
 typedef struct
 {
-    const char* json
+    const char* json;
+    char *stack;
+    size_t top,size;
 }lept_context;
 
-/*start get_data function */
+/*free function*/
+void lept_free(lept_value *v)
+{
+    assert(v != NULL);
+    if(v->type == LEPT_STRING)
+        free(v->u.s.str);
+    v->type = LEPT_NULL;
+}
+
+
+/*get data function */
 double lept_get_number(const lept_value* v)
 {
     assert(v != NULL && v->type == LEPT_NUM);
-    return v->n;
+    return v->u.n;
 }
 
 lept_type lept_get_type(const lept_value* v) {
@@ -23,8 +40,44 @@ lept_type lept_get_type(const lept_value* v) {
     return v->type;
 }
 
-/*end get_data function */
+/*set data function*/
+void lept_set_string(lept_value *v, const char* s, size_t len){
 
+    assert(v != NULL && (s != NULL || len == 0));
+    lept_free(v);
+    v->u.s.str = (char*)malloc(len+1);
+    memcpy(v->u.s.str , s ,len);
+    v->u.s.str[len] = '/0';
+    v->type = LEPT_STRING;
+}
+
+/*stack function*/
+static void* lept_stack_push(lept_context* c, size_t size)
+{
+    assert(size > 0);
+    void* res;
+    if(c->top + size >= c->size)
+    {
+        if(c->size == 0)
+            c->size = STACK_INIT_SIZE;
+        while (c->top + size > c->size)
+        {
+            c->size *= 1.5;
+        }
+        c->stack = (char*)realloc(c->stack,c->size);
+    }
+    res = c->stack + c->top;
+    c->top += size;
+
+    return res; //返回的是栈顶指针
+} 
+
+static void* lept_stack_pop(lept_context* c, size_t size)
+{
+    assert(c->top >= size);
+    
+    return c->stack + (c->top -= size);
+} 
 
 // 去除json字符串前的空格
 static void lept_parse_wthinspace(lept_context *c)
@@ -36,23 +89,16 @@ static void lept_parse_wthinspace(lept_context *c)
 }
 
 // 
-static int lept_parse_literal(lept_context *c , lept_value *v , char *compare_str , lept_type type)
+static int lept_parse_literal(lept_context *c , lept_value *v , const char *compare_str , lept_type type)
 {
-    
-    while (*c->json != '\0' && *compare_str != '\0')
-    {
-        if(*c->json != *compare_str)
+    size_t i = 0;
+    EXPECT(c,compare_str[0]);
+    for (i = 0;compare_str[i+1] ; i++)
+        if(c->json[i] != compare_str[i+1])
             return LEPT_PARSE_INVALID_VALUE;
-        else
-        {
-            c->json++;
-            compare_str++;
-        }
-    }
+    
 
-    if(*c->json == '\0' && *c->json != *compare_str)
-        return LEPT_PARSE_INVALID_VALUE;
-
+    c->json +=i;
     v->type = type;
     return LEPT_PARSE_OK;
 
@@ -60,32 +106,47 @@ static int lept_parse_literal(lept_context *c , lept_value *v , char *compare_st
 
 static int lept_parse_number(lept_context *c , lept_value *v)
 {
-    char* ch = c->json;
+    const char* ch = c->json;
     if(*ch == '-')
-        ch += 1;
+        ch++;
 
-    if(!ISDIGIT(ch))
-        return LEPT_PARSE_INVALID_VALUE;
+    if(*ch == '0')
+        ch++;
     else
-        ch += 1;
-    
-    char* cur_ptr = ch;
-    char* after_ptr = ch + 1;
-    while (*cur_ptr != '\0')
     {
-        if(*cur_ptr == '.' && !ISDIGIT(*after_ptr))
+        if(!ISDIGIT1TO9(*ch))
+            return LEPT_PARSE_INVALID_VALUE;
+        
+        for (ch++ ;ISDIGIT(*ch) ; ch++);
+        
+    }
+
+    if (*ch == '.')
+    {
+        ch++;
+        if(!ISDIGIT(*ch))
             return LEPT_PARSE_INVALID_VALUE;
 
-        cur_ptr++;
-        after_ptr++;
+        for (ch++ ;ISDIGIT(*ch) ; ch++);
     }
     
+    if(*ch == 'E' || *ch == 'e')
+    {
+        ch++;
+        if(*ch == '+' || *ch == '-')
+            ch++;
+        
+        if(!ISDIGIT(*ch)) return LEPT_PARSE_INVALID_VALUE;
+        for(ch++ ; ISDIGIT(*ch); ch++);
+    }
+    errno = 0;
 
-    int res = strtod(c->json,NULL);
+    v->u.n = strtod(c->json,NULL);
+    if(errno == ERANGE && (v->u.n == HUGE_VAL || v->u.n == -HUGE_VAL))
+        return LEPT_PARSE_INVALID_VALUE;
     
-
-    v->n = res;
     v->type = LEPT_NUM;
+    c->json = ch;
 
     return LEPT_PARSE_OK;
 }

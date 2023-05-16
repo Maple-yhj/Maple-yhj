@@ -7,7 +7,14 @@ typedef enum{LEPT_NULL ,LEPT_TRUE ,LEPT_FALSE ,LEPT_NUM ,LEPT_STRING ,LEPT_ARRAY
 /*树结点*/
 typedef struct
 {
-    double n;
+    union{
+        struct 
+        {
+            char *str;
+            size_t len;
+        }s;
+        double n;
+    }u;
     lept_type type;
 }lept_value;
 

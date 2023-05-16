@@ -1,0 +1,2 @@
+F:\TDM-GCC-64\bin\ar.exe qc F:\personal_project\studyJson\lib\libleptjson.a CMakeFiles/leptjson.dir/include/leptjson.c.obj
+F:\TDM-GCC-64\bin\ranlib.exe F:\personal_project\studyJson\lib\libleptjson.a
